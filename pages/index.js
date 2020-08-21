@@ -1,65 +1,92 @@
+import { usestate, useEffect, useState } from 'react'
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import AppLayout from '../components/AppLayout'
+import { colors } from '../styles/theme'
+import Button from '../components/Button'
+import GitHub from '../components/Icons/GitHun'
 
-export default function Home() {
+import { loginWithGitHub, onAuthStateChanged } from '../firebase/client'
+
+export default function Home () {
+  const [user, setUser] = useState(undefined)
+
+  useEffect(() => {
+    onAuthStateChanged(setUser)
+  }, [])
+
+  const handleClick = () => {
+    loginWithGitHub().then(user => {
+      const { avatar, username, url } = user
+      setUser(user)
+      console.log(user)
+    }).catch(err => {
+      console.log(err)
+    })
+  }
+
   return (
-    <div className={styles.container}>
+    <>
       <Head>
-        <title>Create Next App</title>
+        <title>devter</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <AppLayout>
+        <section>
+          <img src = '/devter-logo.png' alt='logo' />
+          <h1>DEVTER</h1>
+          <h2>Talk about development <br /> with developers </h2>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+          <div>
+            {
+              user == null &&
+              <Button onClick={handleClick}>
+                <GitHub fill='#fff' width={24} height={24}/>
+                Login with GitHub
+              </Button>
+            }
+            {
+              user && user.avatar && <div>
+                <img src={user.avatar}/>
+                <strong>{user.username}</strong>
+              </div>
+            }
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+          </div>
+        </section>
+      </AppLayout>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+      <style jsx>{` 
+        img{
+          width: 200px;
+          border-radius: 50px;
+        
+        }   
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+        div{
+          margin-top: 16px;
+        }
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+        section{
+          display: grid;
+          height: 100%;
+          place-content: center;
+          place-items: center;
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+        }  
+        h1{
+          color: ${colors.secundary};
+          font-weight: 800;
+          margin-bottom: 16px;
+        } 
+        h2{
+          color: ${colors.primary};
+          font-size: 21px;
+          margin: 0;
+        }
+
+      `}</style>
+
+    </>
   )
 }
