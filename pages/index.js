@@ -1,25 +1,25 @@
-import { usestate, useEffect, useState } from 'react'
-import Head from 'next/head'
-import AppLayout from '../components/AppLayout'
-import { colors } from '../styles/theme'
-import Button from '../components/Button'
-import GitHub from '../components/Icons/GitHun'
+import { usestate, useEffect, useState } from "react"
+import { useRouter } from "next/router"
+import Head from "next/head"
+import { colors } from "styles/theme"
 
-import { loginWithGitHub, onAuthStateChanged } from '../firebase/client'
+import AppLayout from "components/AppLayout"
+import Button from "components/Button"
+import GitHub from "components/Icons/GitHun"
+import Logo from "components/Icons/Logo"
+import { loginWithGitHub } from "firebase/client"
+import useUser, { USER_STATES } from "hooks/useUser"
 
-export default function Home () {
-  const [user, setUser] = useState(undefined)
+export default function Home() {
+  const user = useUser()
+  const router = useRouter()
 
   useEffect(() => {
-    onAuthStateChanged(setUser)
-  }, [])
+    user && router.replace("/home")
+  }, [user])
 
   const handleClick = () => {
-    loginWithGitHub().then(user => {
-      const { avatar, username, url } = user
-      setUser(user)
-      console.log(user)
-    }).catch(err => {
+    loginWithGitHub().catch((err) => {
       console.log(err)
     })
   }
@@ -33,60 +33,52 @@ export default function Home () {
 
       <AppLayout>
         <section>
-          <img src = '/devter-logo.png' alt='logo' />
+          <Logo width="100" />
           <h1>DEVTER</h1>
-          <h2>Talk about development <br /> with developers </h2>
+          <h2>
+            Talk about development <br /> with developers{" "}
+          </h2>
 
           <div>
-            {
-              user == null &&
+            {user === USER_STATES.NOT_LOGGED && (
               <Button onClick={handleClick}>
-                <GitHub fill='#fff' width={24} height={24}/>
+                <GitHub fill="#fff" width={24} height={24} />
                 Login with GitHub
               </Button>
-            }
-            {
-              user && user.avatar && <div>
-                <img src={user.avatar}/>
-                <strong>{user.username}</strong>
-              </div>
-            }
-
+            )}
+            {user === USER_STATES.NOT_KNOWN && <img src="spinner.gif" />}
           </div>
         </section>
       </AppLayout>
 
-      <style jsx>{` 
-        img{
+      <style jsx>{`
+        img {
           width: 200px;
           border-radius: 50px;
-        
-        }   
+        }
 
-        div{
+        div {
           margin-top: 16px;
         }
 
-        section{
+        section {
           display: grid;
           height: 100%;
           place-content: center;
           place-items: center;
-
-        }  
-        h1{
-          color: ${colors.secundary};
-          font-weight: 800;
-          margin-bottom: 16px;
-        } 
-        h2{
+        }
+        h1 {
           color: ${colors.primary};
+          font-weight: 800;
+          font-size:32px:
+          margin-bottom: 16px;
+        }
+        h2 {
+          color: ${colors.secundary};
           font-size: 21px;
           margin: 0;
         }
-
       `}</style>
-
     </>
   )
 }
