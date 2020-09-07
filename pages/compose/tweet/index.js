@@ -1,9 +1,9 @@
 import AppLayout from "components/AppLayout"
 import Button from "components/Button"
-import useUser from "hooks/useUser"
+// import useUser from "hooks/useUser"
 
 export default function ComposeTweet() {
-  const user = useUser()
+  //   const user = useUser()
 
   return (
     <>
