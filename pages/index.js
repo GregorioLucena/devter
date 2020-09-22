@@ -1,4 +1,4 @@
-import { usestate, useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import { colors } from "styles/theme"
